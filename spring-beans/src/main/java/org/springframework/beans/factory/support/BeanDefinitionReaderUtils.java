@@ -60,10 +60,12 @@ public abstract class BeanDefinitionReaderUtils {
 		GenericBeanDefinition bd = new GenericBeanDefinition();
 		bd.setParentName(parentName);
 		if (className != null) {
+			// classLoader 不为null 则设置bd 中的beanClass字段 为class对象
 			if (classLoader != null) {
 				bd.setBeanClass(ClassUtils.forName(className, classLoader));
 			}
 			else {
+				// 否则 bd中保留className字段
 				bd.setBeanClassName(className);
 			}
 		}
@@ -160,10 +162,12 @@ public abstract class BeanDefinitionReaderUtils {
 			throws BeanDefinitionStoreException {
 
 		// Register bean definition under primary name.
+		// 获取解析的beanDefinition的名称
 		String beanName = definitionHolder.getBeanName();
+		// 向spring ioc 注册 BeanDefinition 核心 真正完成功能的是 DefaultListableBeanFactory
 		registry.registerBeanDefinition(beanName, definitionHolder.getBeanDefinition());
 
-		// Register aliases for bean name, if any.
+		// Register aliases for bean name, if any.  如果解析的BeanDefinition有别名，向spring ioc 容器注册别名
 		String[] aliases = definitionHolder.getAliases();
 		if (aliases != null) {
 			for (String alias : aliases) {

@@ -1,6 +1,7 @@
 package com.qjx;
 
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
@@ -12,5 +13,8 @@ public class Main {
 		UserService userService = (UserService) applicationContext.getBean("userService");
 		User user = userService.getUserById(1);
 		System.out.println(user);
+
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Main.class);
+		Object a = context.getBean("A");
 	}
 }
