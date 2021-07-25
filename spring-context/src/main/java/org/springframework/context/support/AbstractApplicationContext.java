@@ -550,20 +550,21 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory. 告诉子类启动refreshBeanFactory()方法，Bean定义资源文件的载入从子类的refreshBeanFactory()方法启动
+			//注册一个叫做 DefaultListableBeanFactory 容器的东西，并且将这个容器注册到 spring ioc 中
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
-			// 为BeanFactory 配置容器特性，例如类加载器、事件处理器等
+			// 为BeanFactory 配置容器特性，例如类加载器、事件处理器等  以及注册一些列的后置处理器
 			prepareBeanFactory(beanFactory);
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
-				// 为容器的某些子类指定特殊的Post事件处理器
+				// 为容器的某些子类指定特殊的Post事件处理器  可以让子类去扩展的
 				postProcessBeanFactory(beanFactory);
 
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
 				// Invoke factory processors registered as beans in the context.
-				//调用所有注册的BeanFactoryPostProcessor的Bean
+				//调用之前已经注册过的BeanFactoryPostProcessor的Bean
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
@@ -701,6 +702,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 		// Configure the bean factory with context callbacks.
 		beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
+		//如果自己定义的bean中依赖了 如下几个需要忽略的，则进行忽略掉自动注入，因为 ApplicationContextAwareProcessor 已经注册了加载过了
 		beanFactory.ignoreDependencyInterface(EnvironmentAware.class);
 		beanFactory.ignoreDependencyInterface(EmbeddedValueResolverAware.class);
 		beanFactory.ignoreDependencyInterface(ResourceLoaderAware.class);
@@ -925,7 +927,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// Stop using the temporary ClassLoader for type matching.
 		beanFactory.setTempClassLoader(null);
 
-		// Allow for caching all bean definition metadata, not expecting further changes.  冻结配置
+		// Allow for caching all bean definition metadata, not expecting further changes.
+		// 冻结配置
 		beanFactory.freezeConfiguration();
 
 		// Instantiate all remaining (non-lazy-init) singletons.
@@ -943,6 +946,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		clearResourceCaches();
 
 		// Initialize lifecycle processor for this context.
+		//声明周期执行器
 		initLifecycleProcessor();
 
 		// Propagate refresh to lifecycle processor first.

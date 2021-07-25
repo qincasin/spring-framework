@@ -14,7 +14,7 @@ public class Main {
 		User user = userService.getUserById(1);
 		System.out.println(user);
 
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Main.class);
-		Object a = context.getBean("A");
+//		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Main.class);
+//		Object a = context.getBean("A");
 	}
 }
