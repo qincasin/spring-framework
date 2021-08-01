@@ -127,18 +127,23 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		// the new (child) delegate with a reference to the parent for fallback purposes,
 		// then ultimately reset this.delegate back to its original (parent) reference.
 		// this behavior emulates a stack of delegates without actually necessitating one.
+		//可能会是嵌套的beans标签，beans标签中嵌套beans标签
 		BeanDefinitionParserDelegate parent = this.delegate;
 		//方法返回一个beans标签 解析器对象
 		this.delegate = createDelegate(getReaderContext(), root, parent);
 
-		//
+		// 返回的beans标签解析器对象是否是一个缺省的namespace
 		if (this.delegate.isDefaultNamespace(root)) {
+			//获取 beans 标签 profile属性 dev prod  test等等的
 			String profileSpec = root.getAttribute(PROFILE_ATTRIBUTE);
 			if (StringUtils.hasText(profileSpec)) {
+				//按照 ,;分割 profile属性
 				String[] specifiedProfiles = StringUtils.tokenizeToStringArray(
 						profileSpec, BeanDefinitionParserDelegate.MULTI_VALUE_ATTRIBUTE_DELIMITERS);
 				// We cannot use Profiles.of(...) since profile expressions are not supported
 				// in XML config. See SPR-12458 for details.
+				// getReaderContext().getEnvironment().acceptsProfiles(String[] args) :条件成立说明beans标签可以继续解析成bd
+				// 条件成立说明 不在能解析为bd
 				if (!getReaderContext().getEnvironment().acceptsProfiles(specifiedProfiles)) {
 					if (logger.isDebugEnabled()) {
 						logger.debug("Skipped XML bean definition file due to specified profiles [" + profileSpec +
@@ -183,6 +188,12 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 		// 说明 root 是spring 的命名空间
 		if (delegate.isDefaultNamespace(root)) {
 			// 解析 beans 中的标签 例如 bean
+			// <beans>
+			//  	<bean> .. </bean>  这些就是 NodeList nl
+			//  	<bean> .. </bean>
+			//  	<bean> .. </bean>
+			//  	<bean> .. </bean>
+			// </beans>
 			NodeList nl = root.getChildNodes();
 			for (int i = 0; i < nl.getLength(); i++) {
 				Node node = nl.item(i);

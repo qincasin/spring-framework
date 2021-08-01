@@ -13,7 +13,7 @@ public class BeanFactoryTest {
 
 		BeanFactory beanFactory = new XmlBeanFactory(new ClassPathResource("spring-bf.xml"));
 		Object a = beanFactory.getBean("componentA");
-		Object b = beanFactory.getBean("componetB");
+		Object b = beanFactory.getBean("componentB");
 		System.out.println(a);
 		System.out.println(b);
 	}

@@ -424,6 +424,7 @@ public class BeanDefinitionParserDelegate {
 
 		String beanName = id;
 		if (!StringUtils.hasText(beanName) && !aliases.isEmpty()) {
+			//拿别名的第一个元素当做beanName
 			beanName = aliases.remove(0);
 			if (logger.isTraceEnabled()) {
 				logger.trace("No XML 'id' specified - using '" + beanName +
@@ -438,6 +439,7 @@ public class BeanDefinitionParserDelegate {
 		//核心    核心逻辑    将ele 标签解析称为bd 对象的过程，都在这个方法里面完成
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
 		if (beanDefinition != null) {
+			//条件成立说明需要自动生成beanName
 			if (!StringUtils.hasText(beanName)) {
 				try {
 					if (containingBean != null) {
@@ -456,6 +458,7 @@ public class BeanDefinitionParserDelegate {
 						// 条件三: 一般都成立
 						// 条件四: !this.readerContext.getRegistry().isBeanNameInUse(beanClassName) 成立 说明 BeanClassName 它没有被使用
 						// 这个时候 就给当前bd 一个别名叫 BeanClassName
+						// BeanClassName 和 beanName区别   --》 BeanClassName 首字母是小写的e
 						if (beanClassName != null &&
 								beanName.startsWith(beanClassName) && beanName.length() > beanClassName.length() &&
 								!this.readerContext.getRegistry().isBeanNameInUse(beanClassName)) {
@@ -473,7 +476,7 @@ public class BeanDefinitionParserDelegate {
 				}
 			}
 			String[] aliasesArray = StringUtils.toStringArray(aliases);
-			// 将beanDefinition 和 beanName 和别名 都包装到 bdHolder中
+			// 将beanDefinition 和 beanName 和别名 都包装到 bdHolder中 !!
 			return new BeanDefinitionHolder(beanDefinition, beanName, aliasesArray);
 		}
 
@@ -524,11 +527,12 @@ public class BeanDefinitionParserDelegate {
 		}
 
 		try {
-			//创建出来了 一个bd对象，bd对象仅仅设置了 class信息
+			//创建出来了 一个bd对象(GenericBeanDefinition)，bd对象仅仅设置了 class信息
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
 
 			// 解析bean 标签上面定义的attribute信息: lazy-init/init-method、depends-on ...
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
+
 			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
 
 			//解析bean中的 <meta> 子标签
@@ -560,6 +564,7 @@ public class BeanDefinitionParserDelegate {
 			error("Unexpected failure during bean definition parsing", ele, ex);
 		}
 		finally {
+			//pop 出来
 			this.parseState.pop();
 		}
 
@@ -807,6 +812,23 @@ public class BeanDefinitionParserDelegate {
 	 * Parse a constructor-arg element.
 	 */
 	public void parseConstructorArgElement(Element ele, BeanDefinition bd) {
+		/**
+		 * <bean id="xxxComponent" name="xxxComponent" class="xx.xx.xx.xxxComponent">
+		 *     <constructor-arg index="0">
+		 *         <value>aaa</value>
+		 *     </constructor-arg>
+		 *     <constructor-arg index="1">
+		 *         <value>bbb</value>
+		 *     </constructor-arg>
+		 *     <constructor-arg index="2">
+		 *         <map>
+		 *             <entry key="key" value="value">
+		 *             ...
+		 *         </map>
+		 *     </constructor-arg>
+		 *
+		 * </bean>
+		 */
 		String indexAttr = ele.getAttribute(INDEX_ATTRIBUTE);
 		String typeAttr = ele.getAttribute(TYPE_ATTRIBUTE);
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);

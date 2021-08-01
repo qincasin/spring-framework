@@ -80,9 +80,12 @@ public abstract class BeanFactoryUtils {
 	 */
 	public static String transformedBeanName(String name) {
 		Assert.notNull(name, "'name' must not be null");
+		//不以 & 开头的 则直接返回 也就是 非 BeanFactory 的实现类的就直接返回
 		if (!name.startsWith(BeanFactory.FACTORY_BEAN_PREFIX)) {
 			return name;
 		}
+		//如果传过来的name是"&abc" 则返回 "abc"
+		//transformedBeanNameCache 这个就是缓存一下，加快下一次获取的速度
 		return transformedBeanNameCache.computeIfAbsent(name, beanName -> {
 			do {
 				beanName = beanName.substring(BeanFactory.FACTORY_BEAN_PREFIX.length());
