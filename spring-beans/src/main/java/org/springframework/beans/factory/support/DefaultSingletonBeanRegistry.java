@@ -651,6 +651,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	protected void destroyBean(String beanName, @Nullable DisposableBean bean) {
 		// Trigger destruction of dependent beans first...
 		Set<String> dependencies;
+		//谁依赖了当前bean，那么依赖的那些bean 以及当前都要去调用析构函数去销毁
 		synchronized (this.dependentBeanMap) {
 			// Within full synchronization in order to guarantee a disconnected Set
 			dependencies = this.dependentBeanMap.remove(beanName);

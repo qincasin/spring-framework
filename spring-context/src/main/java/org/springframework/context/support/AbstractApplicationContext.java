@@ -555,11 +555,13 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 			// Prepare the bean factory for use in this context.
 			// 为BeanFactory 配置容器特性，例如类加载器、事件处理器等  以及注册一些列的后置处理器
+			//预处理 bf
 			prepareBeanFactory(beanFactory);
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
 				// 为容器的某些子类指定特殊的Post事件处理器  可以让子类去扩展的
+				// 空方法， 留给子类实现，用于注册一些beanFactoryPostProcessor
 				postProcessBeanFactory(beanFactory);
 
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
@@ -694,13 +696,17 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void prepareBeanFactory(ConfigurableListableBeanFactory beanFactory) {
 		// Tell the internal bean factory to use the context's class loader etc.
+		//给当前bf设置一个类加载器，用于加载bd的class信息
 		beanFactory.setBeanClassLoader(getClassLoader());
 		if (!shouldIgnoreSpel) {
 			beanFactory.setBeanExpressionResolver(new StandardBeanExpressionResolver(beanFactory.getBeanClassLoader())); //spring el 表达式
 		}
+		//BeanWrapper 本身就是属性编辑器注册中心 属性编辑器作用域beanWrapper内部管理的真实bean 注入字段值时，
+		// 当某个字段对应的类型 在BeanWrapper内，有对应的属性编辑器  那么对应类型的字段值 就由该属性编辑器 代理写入
 		beanFactory.addPropertyEditorRegistrar(new ResourceEditorRegistrar(this, getEnvironment()));
 
 		// Configure the bean factory with context callbacks.
+		// 添加后置处理器  该后置处理器 主要用户向bean内部注入一些 框架级别的实例， 比如说 ：环境变量或者 ApplicationContext ....
 		beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
 		//如果自己定义的bean中依赖了 如下几个需要忽略的，则进行忽略掉自动注入，因为 ApplicationContextAwareProcessor 已经注册了加载过了
 		beanFactory.ignoreDependencyInterface(EnvironmentAware.class);
@@ -719,6 +725,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		beanFactory.registerResolvableDependency(ApplicationContext.class, this);
 
 		// Register early post-processor for detecting inner beans as ApplicationListeners.
+		//该后置处理器 将配置的监听者 注册到 ac 中
 		beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(this));
 
 		// Detect a LoadTimeWeaver and prepare for weaving, if found.

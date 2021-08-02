@@ -133,6 +133,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 			customizeBeanFactory(beanFactory);
 			//调用载入Bean定义的方法，委托模式
 			//当前类之定义了抽象的loadBeanDefinitions()方法，调用子类容器实现
+			//加载bd信息，这一步完成后 所有的配置信息 (bd) 就注册到了bf(beanFactory)内了
 			loadBeanDefinitions(beanFactory);
 			this.beanFactory = beanFactory;
 		}
