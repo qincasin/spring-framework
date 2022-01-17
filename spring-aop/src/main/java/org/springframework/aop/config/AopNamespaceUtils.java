@@ -80,14 +80,21 @@ public abstract class AopNamespaceUtils {
 		registerComponentIfNecessary(beanDefinition, parserContext);
 	}
 
+	//参数1 spring容器
+	//参数2 aop标签
 	private static void useClassProxyingIfNecessary(BeanDefinitionRegistry registry, @Nullable Element sourceElement) {
 		if (sourceElement != null) {
+			//proxy-target-class 标签属性：true 标识AOP 底层实现使用 cglib 默认这个属性是false
 			boolean proxyTargetClass = Boolean.parseBoolean(sourceElement.getAttribute(PROXY_TARGET_CLASS_ATTRIBUTE));
 			if (proxyTargetClass) {
+				//配置了 proxy-target-class 并且是 true
+				//获取出来AOP 相关的的BD  向这个BD里面添加一个属性，proxyTargetClass=true
 				AopConfigUtils.forceAutoProxyCreatorToUseClassProxying(registry);
 			}
+			//expose-proxy 作用就是将当前 代理对象 暴露到上下文内，方便代理对象内部的真实对象 拿到 代理对象
 			boolean exposeProxy = Boolean.parseBoolean(sourceElement.getAttribute(EXPOSE_PROXY_ATTRIBUTE));
 			if (exposeProxy) {
+				//获取出来AOP相关的这个BD，向这个BD里面 添加一个属性，exposeProxy=true
 				AopConfigUtils.forceAutoProxyCreatorToExposeProxy(registry);
 			}
 		}

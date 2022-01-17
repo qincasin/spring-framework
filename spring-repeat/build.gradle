@@ -10,11 +10,21 @@ repositories {
 }
 
 dependencies {
+    compile(project(":spring-core"))
+    compile(project(":spring-aop"))
+    compile(project(":spring-beans"))
     compile(project(":spring-context"))
+    compile(project(":spring-web"))
+    compile(project(":spring-tx"))
+    compile(project(":spring-jdbc"))
     compile("org.aspectj:aspectjrt:1.9.5")
     compile("org.aspectj:aspectjweaver:1.9.5")
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    implementation group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.8.0'
+    // https://mvnrepository.com/artifact/mysql/mysql-connector-java
+    implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.26'
+
 }
 
 test {

@@ -132,6 +132,8 @@ public abstract class AopConfigUtils {
 			return null;
 		}
 
+		//正常路径，执行下面的代码
+
 		RootBeanDefinition beanDefinition = new RootBeanDefinition(cls);
 		beanDefinition.setSource(source);
 		beanDefinition.getPropertyValues().add("order", Ordered.HIGHEST_PRECEDENCE);
