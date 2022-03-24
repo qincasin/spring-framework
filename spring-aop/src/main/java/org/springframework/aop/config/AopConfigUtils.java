@@ -114,13 +114,22 @@ public abstract class AopConfigUtils {
 		}
 	}
 
+	/**
+	 * 
+	 * @param cls   固定类型 AnnotationAwareAspectJAutoProxyCreator  很关键的class，咱们的 AOP功能 全靠这个class了
+	 * @param registry spring 容器
+	 * @param source element
+	 * @return
+	 */
 	@Nullable
 	private static BeanDefinition registerOrEscalateApcAsRequired(
 			Class<?> cls, BeanDefinitionRegistry registry, @Nullable Object source) {
 
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
 
+		//判断容器内是否有 名称 是 AUTO_PROXY_CREATOR_BEAN_NAME
 		if (registry.containsBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME)) {
+			//一般不会走这里， 走这里的主要原因 是 自定义 注解解析器了
 			BeanDefinition apcDefinition = registry.getBeanDefinition(AUTO_PROXY_CREATOR_BEAN_NAME);
 			if (!cls.getName().equals(apcDefinition.getBeanClassName())) {
 				int currentPriority = findPriorityForClass(apcDefinition.getBeanClassName());
@@ -133,7 +142,8 @@ public abstract class AopConfigUtils {
 		}
 
 		//正常路径，执行下面的代码
-
+		//InfrastructureAdvisorAutoProxyCreator 也走这里，注册到容器
+		//创建了一个BD，并且设置 class 是AnnotationAwareAspectJAutoProxyCreator  最后将这个bd注册到 容器中了
 		RootBeanDefinition beanDefinition = new RootBeanDefinition(cls);
 		beanDefinition.setSource(source);
 		beanDefinition.getPropertyValues().add("order", Ordered.HIGHEST_PRECEDENCE);

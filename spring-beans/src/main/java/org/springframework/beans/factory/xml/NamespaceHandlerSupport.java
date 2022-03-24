@@ -80,7 +80,7 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	 */
 	@Nullable
 	private BeanDefinitionParser findParserForElement(Element element, ParserContext parserContext) {
-		String localName = parserContext.getDelegate().getLocalName(element);
+		String localName = parserContext.getDelegate().getLocalName(element); //这里其实解析出来的就是 <tx:annotation-driven > 标签
 		BeanDefinitionParser parser = this.parsers.get(localName);
 		if (parser == null) {
 			parserContext.getReaderContext().fatal(
@@ -110,7 +110,7 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	@Nullable
 	private BeanDefinitionDecorator findDecoratorForNode(Node node, ParserContext parserContext) {
 		BeanDefinitionDecorator decorator = null;
-		String localName = parserContext.getDelegate().getLocalName(node);
+		String localName = parserContext.getDelegate().getLocalName(node); //这里其实解析出来的就是 <tx:annotation-driven > 标签
 		if (node instanceof Element) {
 			decorator = this.decorators.get(localName);
 		}

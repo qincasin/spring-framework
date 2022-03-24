@@ -62,7 +62,7 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
 		//element----->    <tx:annotation-driven transaction-manager="transactionManager"/>
 
-		//向spring容器注册了一个 BD --> TransactionalEventListenerFactory.class
+		//向spring容器注册了一个 BD --> 包装的class是 TransactionalEventListenerFactory.class
 
 		registerTransactionalEventListenerFactory(parserContext);
 		String mode = element.getAttribute("mode");
@@ -124,6 +124,11 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 	 */
 	private static class AopAutoProxyConfigurer {
 		//这个里面注入了 4个BD
+		// 1.InfrastructureAdvisorAutoProxyCreator
+		// 2.AnnotationTransactionAttributeSource
+		// 3.TransactionInterceptor
+		// 4.BeanFactoryTransactionAttributeSourceAdvisor
+
 		public static void configureAutoProxyCreator(Element element, ParserContext parserContext) {
 			//向spring容器注册BD --> InfrastructureAdvisorAutoProxyCreator.class ,BD的名称：org.springframework.aop.config.internalAutoProxyCreator
 			AopNamespaceUtils.registerAutoProxyCreatorIfNecessary(parserContext, element);
@@ -159,6 +164,9 @@ class AnnotationDrivenBeanDefinitionParser implements BeanDefinitionParser {
 				interceptorDef.getPropertyValues().add("transactionAttributeSource", new RuntimeBeanReference(sourceName));
 				//又是生成一个名字
 				String interceptorName = parserContext.getReaderContext().registerWithGeneratedName(interceptorDef);
+
+
+
 
 				//创建 一个BD --> BeanFactoryTransactionAttributeSourceAdvisor.class(事务增强器)
 				// Create the TransactionAttributeSourceAdvisor definition.
