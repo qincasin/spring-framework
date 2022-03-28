@@ -120,6 +120,7 @@ public abstract class AbstractFallbackTransactionAttributeSource
 			}
 		}
 		else {
+			//提取 @Transactional注解信息
 			// We need to work it out.
 			TransactionAttribute txAttr = computeTransactionAttribute(method, targetClass);
 			// Put it in the cache.
@@ -168,16 +169,21 @@ public abstract class AbstractFallbackTransactionAttributeSource
 			return null;
 		}
 
+
+		//获取目标类上面的method，因为 参数method 可能是接口上定义的method
 		// The method may be on an interface, but we need attributes from the target class.
 		// If the target class is null, the method will be unchanged.
 		Method specificMethod = AopUtils.getMostSpecificMethod(method, targetClass);
 
+
+		//获取目标类上的method接口实现方法的@Transactional 注解信息
 		// First try is the method in the target class.
 		TransactionAttribute txAttr = findTransactionAttribute(specificMethod);
 		if (txAttr != null) {
 			return txAttr;
 		}
 
+		//获取目标类上 @Transactional 注解信息
 		// Second try is the transaction attribute on the target class.
 		txAttr = findTransactionAttribute(specificMethod.getDeclaringClass());
 		if (txAttr != null && ClassUtils.isUserLevelMethod(method)) {
@@ -185,11 +191,13 @@ public abstract class AbstractFallbackTransactionAttributeSource
 		}
 
 		if (specificMethod != method) {
+			//到接口上的 的method 方法上 提取@Transactional 注解信息
 			// Fallback is to look at the original method.
 			txAttr = findTransactionAttribute(method);
 			if (txAttr != null) {
 				return txAttr;
 			}
+			//到接口的 class 上去提取 @Transactional 注解信息
 			// Last fallback is the class of the original method.
 			txAttr = findTransactionAttribute(method.getDeclaringClass());
 			if (txAttr != null && ClassUtils.isUserLevelMethod(method)) {
@@ -197,6 +205,7 @@ public abstract class AbstractFallbackTransactionAttributeSource
 			}
 		}
 
+		//返回 null ，说明method 并没有定义 @Transactional 注解
 		return null;
 	}
 
