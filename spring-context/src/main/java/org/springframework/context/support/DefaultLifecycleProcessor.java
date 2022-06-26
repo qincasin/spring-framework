@@ -138,13 +138,24 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 
 	// Internal helpers
 
+	/**
+	 *  autoStartupOnly
+	 *  true 表示 只启动 SmartLifeCycle 声明周期对象，并且启动的SmartLifeCycle对象它的autoStartup是true。
+	 *  	 不会启动 普通的lifeCycle声明周期
+	 *  false 全部启动
+	 */
 	private void startBeans(boolean autoStartupOnly) {
+		//获取到所有实现了Lifecycle接口的对象，包装到map内，key是beanName，value：是Lifecycle对象
 		Map<String, Lifecycle> lifecycleBeans = getLifecycleBeans();
+		//因为声明周期对象 可能依赖其他生命周期对象的执行结果，所以需要执行顺序，靠什么实现？
+		//靠phases(阶段) 数值 ；phases数值越低，lifecycle越先执行 start 方法
 		Map<Integer, LifecycleGroup> phases = new TreeMap<>();
 
 		lifecycleBeans.forEach((beanName, bean) -> {
 			if (!autoStartupOnly || (bean instanceof SmartLifecycle && ((SmartLifecycle) bean).isAutoStartup())) {
+				//获取当前每个 Lifecycle 对象的 phase值
 				int phase = getPhase(bean);
+				//如果不存在就new一个，如果存在就添加进去
 				phases.computeIfAbsent(
 						phase,
 						p -> new LifecycleGroup(phase, this.timeoutPerShutdownPhase, lifecycleBeans, autoStartupOnly)
@@ -152,6 +163,7 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 			}
 		});
 		if (!phases.isEmpty()) {
+			//逐个遍历，执行start方法
 			phases.values().forEach(LifecycleGroup::start);
 		}
 	}
@@ -159,13 +171,16 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 	/**
 	 * Start the specified bean as part of the given set of Lifecycle beans,
 	 * making sure that any beans that it depends on are started first.
+	 * 将指定的 bean 作为给定生命周期 bean 集的一部分启动，确保首先启动它所依赖的任何 bean
 	 * @param lifecycleBeans a Map with bean name as key and Lifecycle instance as value
 	 * @param beanName the name of the bean to start
 	 */
 	private void doStart(Map<String, ? extends Lifecycle> lifecycleBeans, String beanName, boolean autoStartupOnly) {
+		//确保lifecycle只被启动一次。在一个分组内 被启动了，其他分组内，就看不到该lifecycle了。
 		Lifecycle bean = lifecycleBeans.remove(beanName);
 		if (bean != null && bean != this) {
 			String[] dependenciesForBean = getBeanFactory().getDependenciesForBean(beanName);
+			//先启动当前lifecycle所依赖的lifecycle
 			for (String dependency : dependenciesForBean) {
 				doStart(lifecycleBeans, dependency, autoStartupOnly);
 			}
@@ -231,6 +246,7 @@ public class DefaultLifecycleProcessor implements LifecycleProcessor, BeanFactor
 									bean.getClass().getName() + "] to stop");
 						}
 						countDownBeanNames.add(beanName);
+						//Smarlifecycle 可以传递一个Callback，理论上可以支持异步关闭 生命周期 对象了，
 						((SmartLifecycle) bean).stop(() -> {
 							latch.countDown();
 							countDownBeanNames.remove(beanName);

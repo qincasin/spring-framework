@@ -922,6 +922,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 			//我们的bean是支持parent的，也就是将parent bean 合并到 BeanDefinition中去，然后在创建出一个 RootBeanDefinition
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
+				//获取factoryBean本身
 				if (isFactoryBean(beanName)) {
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
 					if (bean instanceof FactoryBean) {
@@ -933,6 +934,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 									getAccessControlContext());
 						}
 						else {
+							//控制 FactoryBean 内部管理的真实bean，在refresh阶段是否也初始化。
 							isEagerInit = (factory instanceof SmartFactoryBean &&
 									((SmartFactoryBean<?>) factory).isEagerInit());
 						}

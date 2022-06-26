@@ -121,6 +121,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	protected final void refreshBeanFactory() throws BeansException {
 		// 如果已经有容器，销毁容器中的Bean,关闭容器
 		if (hasBeanFactory()) {
+			//销毁原BeanFactory的内部实例
 			destroyBeans();
 			closeBeanFactory();
 		}
@@ -134,7 +135,9 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 			//调用载入Bean定义的方法，委托模式
 			//当前类之定义了抽象的loadBeanDefinitions()方法，调用子类容器实现
 			//加载bd信息，这一步完成后 所有的配置信息 (bd) 就注册到了bf(beanFactory)内了
+			//加载 bd 信息
 			loadBeanDefinitions(beanFactory);
+
 			this.beanFactory = beanFactory;
 		}
 		catch (IOException ex) {
@@ -154,6 +157,7 @@ public abstract class AbstractRefreshableApplicationContext extends AbstractAppl
 	@Override
 	protected final void closeBeanFactory() {
 		DefaultListableBeanFactory beanFactory = this.beanFactory;
+		//这一步就是将context 内部的 beanFactory设置为null，因为后续会创建一个全新的beanFactory
 		if (beanFactory != null) {
 			beanFactory.setSerializationId(null);
 			this.beanFactory = null;
