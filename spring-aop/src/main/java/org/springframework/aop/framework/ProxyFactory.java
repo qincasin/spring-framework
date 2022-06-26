@@ -47,7 +47,9 @@ public class ProxyFactory extends ProxyCreatorSupport {
 	 * @param target the target object to be proxied
 	 */
 	public ProxyFactory(Object target) {
+		//将目标对象封装成为 SingletonTargetSource 保存到父类字段内
 		setTarget(target);
+		//获取目标对象class的所有接口，保存到父类字段内
 		setInterfaces(ClassUtils.getAllInterfaces(target));
 	}
 

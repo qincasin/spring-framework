@@ -743,6 +743,7 @@ public abstract class ClassUtils {
 	 * Return all interfaces that the given class implements as a Set,
 	 * including ones implemented by superclasses.
 	 * <p>If the class itself is an interface, it gets returned as sole interface.
+	 * 返回给定类作为 Set 实现的所有接口，包括由超类实现的接口。 <p>如果类本身是一个接口，它将作为唯一接口返回。
 	 * @param clazz the class to analyze for interfaces
 	 * @param classLoader the ClassLoader that the interfaces need to be visible in
 	 * (may be {@code null} when accepting all declared interfaces)
