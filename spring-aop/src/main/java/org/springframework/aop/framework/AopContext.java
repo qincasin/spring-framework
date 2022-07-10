@@ -76,6 +76,8 @@ public final class AopContext {
 	/**
 	 * Make the given proxy available via the {@code currentProxy()} method.
 	 * <p>Note that the caller should be careful to keep the old value as appropriate.
+	 * 通过 {@code currentProxy()} 方法使给定的代理可用。
+	 * <p>请注意，调用者应注意适当地保留旧值。
 	 * @param proxy the proxy to expose (or {@code null} to reset it)
 	 * @return the old proxy, which may be {@code null} if none was bound
 	 * @see #currentProxy()

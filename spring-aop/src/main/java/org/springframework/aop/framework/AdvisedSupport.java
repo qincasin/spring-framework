@@ -248,12 +248,13 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 
 	@Override
 	public void addAdvisor(Advisor advisor) {
+		//获取当前已经持有的 "通知"个数
 		int pos = this.advisors.size();
 		addAdvisor(pos, advisor);
 	}
 
 	@Override
-	public void addAdvisor(int pos, Advisor advisor) throws AopConfigException {
+	public void  addAdvisor(int pos, Advisor advisor) throws AopConfigException {
 		if (advisor instanceof IntroductionAdvisor) {
 			validateIntroductionAdvisor((IntroductionAdvisor) advisor);
 		}
@@ -463,6 +464,7 @@ public class AdvisedSupport extends ProxyConfig implements Advised {
 	/**
 	 * Determine a list of {@link org.aopalliance.intercept.MethodInterceptor} objects
 	 * for the given method, based on this configuration.
+	 * 根据此配置确定给定方法的 {@link org.aopalliance.intercept.MethodInterceptor} 对象列表。
 	 * @param method the proxied method
 	 * @param targetClass the target class
 	 * @return a List of MethodInterceptors (may also include InterceptorAndDynamicMethodMatchers)

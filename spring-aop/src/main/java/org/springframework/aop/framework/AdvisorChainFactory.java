@@ -32,6 +32,7 @@ public interface AdvisorChainFactory {
 	/**
 	 * Determine a list of {@link org.aopalliance.intercept.MethodInterceptor} objects
 	 * for the given advisor chain configuration.
+	 * 确定给定advisor chain 配置的 {@link org.aopalliance.intercept.MethodInterceptor} 对象列表。
 	 * @param config the AOP configuration in the form of an Advised object
 	 * @param method the proxied method
 	 * @param targetClass the target class (may be {@code null} to indicate a proxy without

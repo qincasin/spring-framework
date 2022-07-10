@@ -29,6 +29,12 @@ import org.aopalliance.aop.Advice;
  * The Advisor interface allows support for different types of advice,
  * such as <b>before</b> and <b>after</b> advice, which need not be
  * implemented using interception.
+ * 基本接口包含 AOP <b>advice<b>（在连接点采取的操作）和确定建议适用性的过滤器（例如切入点）。
+ * <i>这个接口不是供 Spring 用户使用的，而是为了支持不同类型的通知的通用性。
+ * <i>
+ * <p>Spring AOP 是基于 <b>around advice<b> 通过方法
+ * <b >interception<b>，符合 AOP 联盟拦截 API。 Advisor 接口允许支持不同类型的通知，
+ * 例如 <b>before<b> 和 <b>after<b> 通知，它们不需要使用拦截来实现。
  *
  * @author Rod Johnson
  * @author Juergen Hoeller

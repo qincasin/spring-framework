@@ -20,6 +20,7 @@ package org.springframework.aop;
  * Superinterface for all Advisors that are driven by a pointcut.
  * This covers nearly all advisors except introduction advisors,
  * for which method-level matching doesn't apply.
+ * 由切入点驱动的所有顾问的超级接口。这几乎涵盖了除介绍Advisors之外的所有Advisors，方法级别匹配不适用。
  *
  * @author Rod Johnson
  */

@@ -31,6 +31,12 @@ package org.springframework.core;
  * (and potential other candidates without spring-aop dependencies) to use it
  * for introspection purposes, in particular annotation lookups.
  *
+ * 通过装饰代理实现的接口，特别是 Spring AOP 代理，但也可能是具有装饰器语义的自定义代理。
+ * <p>请注意，如果装饰类不在代理类的层次结构中，则应该只实现此接口。
+ * 特别是，诸如 Spring AOP CGLIB 代理之类的“目标类”代理不应该实现它，因为对目标类的任何查找都可以简单地在代理类上执行。
+ * <p>在核心模块中定义，以允许 {@link org.springframework.core.annotation.AnnotationAwareOrderComparator}
+ * （以及其他没有 spring-aop 依赖项的潜在候选者）将其用于自省目的，特别是注释查找。
+ *
  * @author Juergen Hoeller
  * @since 4.3
  */
