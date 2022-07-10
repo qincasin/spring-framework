@@ -289,8 +289,10 @@ configure(allprojects) { project ->
 		}
 		allprojects{
 			repositories{
-				maven{url 'http://maven.aliyun.com/nexus/content/groups/public/'}
-			}
+                maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' } //阿里云
+                maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
+                maven { url "https://repo.spring.io/snapshot" }
+            }
 		}
 		repositories {
 			mavenCentral()
@@ -311,7 +313,7 @@ configure([rootProject] + javaProjects) { project ->
 
 	apply plugin: "java"
 	apply plugin: "java-test-fixtures"
-	apply plugin: "checkstyle"
+//	apply plugin: "checkstyle"
 	apply plugin: 'org.springframework.build.compile'
 	apply from: "${rootDir}/gradle/toolchains.gradle"
 	apply from: "${rootDir}/gradle/ide.gradle"
@@ -362,7 +364,7 @@ configure([rootProject] + javaProjects) { project ->
 		// JSR-305 only used for non-required meta-annotations
 		compileOnly("com.google.code.findbugs:jsr305")
 		testCompileOnly("com.google.code.findbugs:jsr305")
-		checkstyle("io.spring.javaformat:spring-javaformat-checkstyle:0.0.15")
+//		checkstyle("io.spring.javaformat:spring-javaformat-checkstyle:0.0.15")
 	}
 
 	ext.javadocLinks = [
