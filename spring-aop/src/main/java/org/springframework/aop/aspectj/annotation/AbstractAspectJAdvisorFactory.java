@@ -130,6 +130,7 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 	@SuppressWarnings("unchecked")
 	@Nullable
 	protected static AspectJAnnotation<?> findAspectJAnnotationOnMethod(Method method) {
+		//检查当前方法 是否有这些注解 ... Pointcut.class, Around.class, Before.class, After.class, AfterReturning.class, AfterThrowing.class
 		for (Class<?> clazz : ASPECTJ_ANNOTATION_CLASSES) {
 			AspectJAnnotation<?> foundAnnotation = findAnnotation(method, (Class<Annotation>) clazz);
 			if (foundAnnotation != null) {
@@ -139,10 +140,20 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 		return null;
 	}
 
+	/**
+	 *
+	 * @param method 检查的当前方法
+	 * @param toLookFor  徐亚检查的直接类型
+	 * @param <A>
+	 * @return
+	 */
 	@Nullable
 	private static <A extends Annotation> AspectJAnnotation<A> findAnnotation(Method method, Class<A> toLookFor) {
+		//提取出来 Annotation 数据...
 		A result = AnnotationUtils.findAnnotation(method, toLookFor);
+		//条件成立 说明当前方法上面定义了 指定类型的 注解
 		if (result != null) {
+			//提取出来当前方法上定义的AspectJ 注解信息
 			return new AspectJAnnotation<>(result);
 		}
 		else {
@@ -191,9 +202,12 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 
 		public AspectJAnnotation(A annotation) {
 			this.annotation = annotation;
+			//将Annotation 类型转换为 对饮的枚举
 			this.annotationType = determineAnnotationType(annotation);
 			try {
+				//解析出来当前注解上定义的 切点表达式
 				this.pointcutExpression = resolveExpression(annotation);
+				// 一般情况下，argNames 咱们不配置， 除非使用到 运行时匹配
 				Object argNames = AnnotationUtils.getValue(annotation, "argNames");
 				this.argumentNames = (argNames instanceof String ? (String) argNames : "");
 			}
@@ -211,6 +225,7 @@ public abstract class AbstractAspectJAdvisorFactory implements AspectJAdvisorFac
 		}
 
 		private String resolveExpression(A annotation) {
+			//检查属性 "value" 、 "pointcut"
 			for (String attributeName : EXPRESSION_ATTRIBUTES) {
 				Object val = AnnotationUtils.getValue(annotation, attributeName);
 				if (val instanceof String) {

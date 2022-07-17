@@ -80,13 +80,24 @@ final class InstantiationModelAwarePointcutAdvisorImpl
 	private Boolean isAfterAdvice;
 
 
+	/**
+	 * 参数1：expressionPointcut: 切点表达式
+	 * 参数2：candidateAdviceMethod 当前方法，内部会把当前方法 封装称为 advice
+	 * 参数3：this ：AdvisorFactory 构建advisor的工厂，
+	 * 参数4：aspectInstanceFactory 通过他可以拿到 @Aspecj 注解 | 拿到元数据
+	 * 参数5：declarationOrderInAspect ...
+	 * 参数6：aspectName ... 添加了 @Aspecj 注解的 当前clas BeanName
+	 */
+
 	public InstantiationModelAwarePointcutAdvisorImpl(AspectJExpressionPointcut declaredPointcut,
 			Method aspectJAdviceMethod, AspectJAdvisorFactory aspectJAdvisorFactory,
 			MetadataAwareAspectInstanceFactory aspectInstanceFactory, int declarationOrder, String aspectName) {
 
 		this.declaredPointcut = declaredPointcut;
 		this.declaringClass = aspectJAdviceMethod.getDeclaringClass();
+		//当前方法 参数类型数组
 		this.methodName = aspectJAdviceMethod.getName();
+		//增强逻辑方法，添加了 @Before ...哪些方法
 		this.parameterTypes = aspectJAdviceMethod.getParameterTypes();
 		this.aspectJAdviceMethod = aspectJAdviceMethod;
 		this.aspectJAdvisorFactory = aspectJAdvisorFactory;
@@ -94,6 +105,7 @@ final class InstantiationModelAwarePointcutAdvisorImpl
 		this.declarationOrder = declarationOrder;
 		this.aspectName = aspectName;
 
+		//正常情况 不走这个分支，  AOP高级应用时走的....
 		if (aspectInstanceFactory.getAspectMetadata().isLazilyInstantiated()) {
 			// Static part of the pointcut is a lazy type.
 			Pointcut preInstantiationPointcut = Pointcuts.union(
@@ -107,9 +119,14 @@ final class InstantiationModelAwarePointcutAdvisorImpl
 			this.lazy = true;
 		}
 		else {
+			//正常逻辑
 			// A singleton aspect.
 			this.pointcut = this.declaredPointcut;
 			this.lazy = false;
+			//创建出来 Advice对象，Advice 和 Advisor 的关系， 是一一对应的关系
+			//Spring 中每个Advisor 内部一定是持有一个 Advice 的
+			//advice 内部最重要的数据是 当前method，因为增强逻辑，最终还是 要通过 反射的方式 调用回当前method
+			//			还有aspectInstanceFactory 通过这个factory 获取到添加 @Aspect 注解的实例，有了 实例 和目标方法， 才能反射调用
 			this.instantiatedAdvice = instantiateAdvice(this.declaredPointcut);
 		}
 	}
@@ -146,6 +163,13 @@ final class InstantiationModelAwarePointcutAdvisorImpl
 	}
 
 	private Advice instantiateAdvice(AspectJExpressionPointcut pointcut) {
+		/**
+		 * 参数1：当前Advisor 内部包装的 添加了@Before ....方法
+		 * 参数2：pointcut 该方法注解上定义的 切点表达式
+		 * 参数3：aspectInstanceFactory
+		 * 参数4：: 0
+		 * 参数5：aspectName
+		 */
 		Advice advice = this.aspectJAdvisorFactory.getAdvice(this.aspectJAdviceMethod, pointcut,
 				this.aspectInstanceFactory, this.declarationOrder, this.aspectName);
 		return (advice != null ? advice : EMPTY_ADVICE);

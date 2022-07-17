@@ -353,26 +353,51 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		if (StringUtils.hasLength(beanName) && this.targetSourcedBeans.contains(beanName)) {
 			return bean;
 		}
+		//条件成立：说明当前beanName对应的对象 不需要被增强处理， 判断是在BeforeInstantiation阶段做的
 		if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {
 			return bean;
 		}
+		//条件一：isInfrastructureClass 判断当前bean 类型是否是基础框架的类型，这个类型的实例 不能被增强
+		//条件二：shouldSkip 判断当前beanName 是否是 .ORIGINAL 结尾，如果是这个结尾，则跳过这个增强逻辑
 		if (isInfrastructureClass(bean.getClass()) || shouldSkip(bean.getClass(), beanName)) {
 			this.advisedBeans.put(cacheKey, Boolean.FALSE);
 			return bean;
 		}
 
+
+
+
 		// Create proxy if we have advice.
 		//查找适合当前bean实例Class的通知(增强信息)
 		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
+
+
+
+
+
+
+
+		//条件成立：说明上面方法有查询到 适合当前clas的通知
 		if (specificInterceptors != DO_NOT_PROXY) {
 			this.advisedBeans.put(cacheKey, Boolean.TRUE);
+
+
+
+			//创建代理对象的逻辑  根据 代理对象查询到的通知
 			Object proxy = createProxy(
 					bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
+
+
+
+			//保存代理对象类型
 			this.proxyTypes.put(cacheKey, proxy.getClass());
+			//返回代理类型
 			return proxy;
 		}
 
+		//执行到这里 说明当前bean不需要增强
 		this.advisedBeans.put(cacheKey, Boolean.FALSE);
+		//执行返回原始bean
 		return bean;
 	}
 
@@ -381,6 +406,8 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	 * that should never be proxied.
 	 * <p>The default implementation considers Advices, Advisors and
 	 * AopInfrastructureBeans as infrastructure classes.
+	 * 返回给定的 bean 类是否代表一个不应该被代理的基础设施类。
+	 * <p>默认实现将 Advices、Advisors 和 AopInfrastructureBeans 视为基础架构类。
 	 * @param beanClass the class of the bean
 	 * @return whether the bean represents an infrastructure class
 	 * @see org.aopalliance.aop.Advice

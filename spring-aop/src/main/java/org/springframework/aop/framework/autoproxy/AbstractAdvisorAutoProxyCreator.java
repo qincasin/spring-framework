@@ -75,7 +75,9 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	protected Object[] getAdvicesAndAdvisorsForBean(
 			Class<?> beanClass, String beanName, @Nullable TargetSource targetSource) {
 
+		// 查询合适当前类型的 增强通知
 		List<Advisor> advisors = findEligibleAdvisors(beanClass, beanName);
+		//
 		if (advisors.isEmpty()) {
 			return DO_NOT_PROXY;
 		}
@@ -84,6 +86,7 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 
 	/**
 	 * Find all eligible Advisors for auto-proxying this class.
+	 * 查找所有符合条件的advisors以自动代理此类。
 	 * @param beanClass the clazz to find advisors for
 	 * @param beanName the name of the currently proxied bean
 	 * @return the empty List, not {@code null},
@@ -93,9 +96,16 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 * @see #extendAdvisors
 	 */
 	protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
+
+		//获取当前项目内所有可以使用的Advisors   重要 ！！！！！！AnnotationAwareAspectJAutoProxyCreator#findCandidateAdvisors()
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
+
+		//将上一步获取到的全部Advisors 做筛选，筛选出来适合自己当前类型的Advisor
 		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
+
+		//在这一步 会在index 0 的位置，添加一个 Advisor 细节会头在说
 		extendAdvisors(eligibleAdvisors);
+
 		if (!eligibleAdvisors.isEmpty()) {
 			eligibleAdvisors = sortAdvisors(eligibleAdvisors);
 		}
@@ -108,12 +118,14 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 */
 	protected List<Advisor> findCandidateAdvisors() {
 		Assert.state(this.advisorRetrievalHelper != null, "No BeanFactoryAdvisorRetrievalHelper available");
+		//这一步 查询出来 通过bean 的方式 提供的Advisors 数据
 		return this.advisorRetrievalHelper.findAdvisorBeans();
 	}
 
 	/**
 	 * Search the given candidate Advisors to find all Advisors that
 	 * can apply to the specified bean.
+	 * 搜索给定的候选顾问以查找可以应用于指定 bean 的所有Adcisors。
 	 * @param candidateAdvisors the candidate Advisors
 	 * @param beanClass the target's bean class
 	 * @param beanName the target's bean name
