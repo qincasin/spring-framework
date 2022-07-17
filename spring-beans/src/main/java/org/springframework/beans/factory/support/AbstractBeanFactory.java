@@ -1890,14 +1890,17 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/**
 	 * Remove the singleton instance (if any) for the given bean name,
 	 * but only if it hasn't been used for other purposes than type checking.
+	 * 删除给定 bean 名称的单例实例（如果有），但前提是它没有用于类型检查以外的其他目的。
 	 * @param beanName the name of the bean
 	 * @return {@code true} if actually removed, {@code false} otherwise
 	 */
-	protected boolean removeSingletonIfCreatedForTypeCheckOnly(String beanName) {
+	protected boolean  removeSingletonIfCreatedForTypeCheckOnly(String beanName) {
+		//!this.alreadyCreated.contains(beanName) 整个条件成立 说明当前bean 尚未创建完成
 		if (!this.alreadyCreated.contains(beanName)) {
 			removeSingleton(beanName);
 			return true;
 		}
+		// 整个条件未成立 说明当前bean 已经创建完成了
 		else {
 			return false;
 		}

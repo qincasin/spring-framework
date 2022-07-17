@@ -644,10 +644,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		if (earlySingletonExposure) {
 			Object earlySingletonReference = getSingleton(beanName, false);
+			//条件成立：说明当前bean实例 从 2级缓存获取到了....
+			//说明产生循环依赖了，，，，，  3级缓存 当前对象的ObjectFactory.getObject() 被调用过
 			if (earlySingletonReference != null) {
+				//条件成立的几种情况？
+				//1. 当前"真实实例" 不需要被代理
+				//2. 当前"实例"已经被代理过了...  是在ObjectFactory.getObject()方法调用时 实现的增强代理
 				if (exposedObject == bean) {
 					exposedObject = earlySingletonReference;
 				}
+
 				else if (!this.allowRawInjectionDespiteWrapping && hasDependentBean(beanName)) {
 					String[] dependentBeans = getDependentBeans(beanName);
 					Set<String> actualDependentBeans = new LinkedHashSet<>(dependentBeans.length);
@@ -656,6 +662,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 							actualDependentBeans.add(dependentBean);
 						}
 					}
+					//为什么会有问题？
+					//因为咱们当前对象的AOP操作是在 当前方法的 initializeBean 这个方法完成的
+					//在这之前，外部其他bean持有到的当前的"bean实例"都是尚未增强的。
 					if (!actualDependentBeans.isEmpty()) {
 						throw new BeanCurrentlyInCreationException(beanName,
 								"Bean with name '" + beanName + "' has been injected into other beans [" +
@@ -1874,7 +1883,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		}
 		if (mbd == null || !mbd.isSynthetic()) {
 			// 后置处理器 动态代理的都是在这里来进行实现的
-			//典型应用 spring aop 的实现
+			//典型应用 spring aop 的实现  后面将AOP系列时，还会来到这里
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
 		}
 

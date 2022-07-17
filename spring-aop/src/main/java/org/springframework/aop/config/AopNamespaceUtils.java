@@ -75,15 +75,24 @@ public abstract class AopNamespaceUtils {
 	public static void registerAspectJAnnotationAutoProxyCreatorIfNecessary(
 			ParserContext parserContext, Element sourceElement) {
 
+		//它会把 aspectj-autoproxy解析成一个 beanDefinition 并且注册到spring 容器内
 		BeanDefinition beanDefinition = AopConfigUtils.registerAspectJAnnotationAutoProxyCreatorIfNecessary(
 				parserContext.getRegistry(), parserContext.extractSource(sourceElement));
+		//执行到这里 spring 容器已经有 AOP 相关的 BeanDefinition  了
+
+		//参数1：spring 容器
+		//参数2：aop标签
+		// 处理两件事情：1.获取出来AOP 相关的的BD  向这个BD里面添加一个属性，proxyTargetClass=true
+		//2.获取出来AOP相关的这个BD，向这个BD里面 添加一个属性，exposeProxy=true
 		useClassProxyingIfNecessary(parserContext.getRegistry(), sourceElement);
+
+		//暂不分析
 		registerComponentIfNecessary(beanDefinition, parserContext);
 	}
 
 	//参数1 spring容器
 	//参数2 aop标签
-	private static void useClassProxyingIfNecessary(BeanDefinitionRegistry registry, @Nullable Element sourceElement) {
+	private static void  useClassProxyingIfNecessary(BeanDefinitionRegistry registry, @Nullable Element sourceElement) {
 		if (sourceElement != null) {
 			//proxy-target-class 标签属性：true 标识AOP 底层实现使用 cglib 默认这个属性是false
 			boolean proxyTargetClass = Boolean.parseBoolean(sourceElement.getAttribute(PROXY_TARGET_CLASS_ATTRIBUTE));
